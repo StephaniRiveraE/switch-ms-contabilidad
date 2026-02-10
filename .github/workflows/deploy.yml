@@ -15,7 +15,8 @@ env:
   NAMESPACE: switch
   ECR_REPO: switch-ms-contabilidad
   SERVICE_NAME: switch-ms-contabilidad
-  CONTAINER_PORT: "8083"
+  # Puerto CORRECTO: 8083 (Debe coincidir con application.properties)
+  CONTAINER_PORT: "8080"
   SECRET_NAME: "switch-db-credentials"
   SECRET_KEY_URL: "contabilidad-url"
   SECRET_KEY_USER: "contabilidad-username"
