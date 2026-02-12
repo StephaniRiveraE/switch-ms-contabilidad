@@ -16,8 +16,8 @@ public class ContabilidadMapper {
         if (entidad == null)
             return null;
         return CuentaDTO.builder()
-                .id(entidad.getId())
-                .codigoBic(entidad.getCodigoBic())
+                .id(entidad.getIdCuenta())
+                .codigoBic(entidad.getBic())
                 .saldoDisponible(entidad.getSaldoDisponible())
                 .firmaIntegridad(entidad.getFirmaIntegridad())
                 .build();
@@ -27,14 +27,14 @@ public class ContabilidadMapper {
         if (entidad == null)
             return null;
         return MovimientoDTO.builder()
-                .id(entidad.getId())
+                .id(entidad.getIdMovimiento())
                 .idInstruccion(entidad.getIdInstruccion())
                 .tipo(entidad.getTipo().name())
                 .monto(entidad.getMonto())
                 .saldoResultante(entidad.getSaldoResultante())
                 .fechaRegistro(entidad.getFechaRegistro())
                 .referenciaId(entidad.getReferenciaId())
-                .codigoBicCuenta(entidad.getCuenta() != null ? entidad.getCuenta().getCodigoBic() : null)
+                .codigoBicCuenta(entidad.getCuenta() != null ? entidad.getCuenta().getBic() : null)
                 .build();
     }
 

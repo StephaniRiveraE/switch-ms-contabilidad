@@ -30,7 +30,7 @@ public class LedgerService {
 
     @Transactional
     public CuentaDTO crearCuenta(CrearCuentaRequest req) {
-        if (cuentaRepo.findByCodigoBic(req.getCodigoBic()).isPresent()) {
+        if (cuentaRepo.findByBic(req.getCodigoBic()).isPresent()) {
             throw new RuntimeException("Cuenta ya existe para el BIC: " + req.getCodigoBic());
         }
 
@@ -43,7 +43,7 @@ public class LedgerService {
 
     @Transactional
     public CuentaDTO registrarMovimiento(RegistroMovimientoRequest req) {
-        CuentaTecnica cuenta = cuentaRepo.findByCodigoBic(req.getCodigoBic())
+        CuentaTecnica cuenta = cuentaRepo.findByBic(req.getCodigoBic())
                 .orElseThrow(() -> new RuntimeException("Cuenta no encontrada para BIC: " + req.getCodigoBic()));
 
         String hashActual = calcularHash(cuenta);
@@ -80,7 +80,7 @@ public class LedgerService {
 
     @Transactional(readOnly = true)
     public CuentaDTO obtenerCuenta(String bic) {
-        CuentaTecnica cuenta = cuentaRepo.findByCodigoBic(bic)
+        CuentaTecnica cuenta = cuentaRepo.findByBic(bic)
                 .orElseThrow(() -> new RuntimeException("Cuenta no encontrada"));
         return mapToDTO(cuenta);
     }
@@ -91,7 +91,7 @@ public class LedgerService {
                     .setScale(2, java.math.RoundingMode.HALF_UP)
                     .toString();
 
-            String data = c.getCodigoBic() + ":" + saldoFormateado;
+            String data = c.getBic() + ":" + saldoFormateado;
 
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             byte[] hash = digest.digest(data.getBytes(StandardCharsets.UTF_8));
@@ -103,8 +103,8 @@ public class LedgerService {
 
     private CuentaDTO mapToDTO(CuentaTecnica c) {
         return CuentaDTO.builder()
-                .id(c.getId())
-                .codigoBic(c.getCodigoBic())
+                .id(c.getIdCuenta())
+                .codigoBic(c.getBic())
                 .saldoDisponible(c.getSaldoDisponible())
                 .firmaIntegridad(c.getFirmaIntegridad())
                 .build();

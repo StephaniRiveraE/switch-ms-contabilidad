@@ -34,7 +34,7 @@ public class ContabilidadServicio {
 
     @Transactional
     public CuentaDTO crearCuenta(CrearCuentaRequest req) {
-        if (cuentaRepo.findByCodigoBic(req.getCodigoBic()).isPresent()) {
+        if (cuentaRepo.findByBic(req.getCodigoBic()).isPresent()) {
             throw new RuntimeException("Cuenta ya existe para el BIC: " + req.getCodigoBic());
         }
 
@@ -47,7 +47,7 @@ public class ContabilidadServicio {
 
     @Transactional
     public CuentaDTO registrarMovimiento(RegistroMovimientoRequest req) {
-        CuentaTecnica cuenta = cuentaRepo.findByCodigoBic(req.getCodigoBic())
+        CuentaTecnica cuenta = cuentaRepo.findByBic(req.getCodigoBic())
                 .orElseThrow(() -> new RuntimeException("Cuenta no encontrada para BIC: " + req.getCodigoBic()));
 
         String hashActual = calcularHash(cuenta);
@@ -83,14 +83,14 @@ public class ContabilidadServicio {
     }
 
     public CuentaDTO obtenerCuenta(String bic) {
-        CuentaTecnica cuenta = cuentaRepo.findByCodigoBic(bic)
+        CuentaTecnica cuenta = cuentaRepo.findByBic(bic)
                 .orElseThrow(() -> new RuntimeException("Cuenta no encontrada"));
         return mapper.toDTO(cuenta);
     }
 
     @Transactional(readOnly = true)
     public boolean verificarSaldo(String bic, BigDecimal monto) {
-        return cuentaRepo.findByCodigoBic(bic)
+        return cuentaRepo.findByBic(bic)
                 .map(cuenta -> cuenta.getSaldoDisponible().compareTo(monto) >= 0)
                 .orElse(false);
     }
@@ -100,12 +100,12 @@ public class ContabilidadServicio {
 
         if (!movimientoRepo.findByIdInstruccion(idInstruccion).isEmpty()) {
 
-            CuentaTecnica cuenta = cuentaRepo.findByCodigoBic(bic)
+            CuentaTecnica cuenta = cuentaRepo.findByBic(bic)
                     .orElseThrow(() -> new RuntimeException("Cuenta no encontrada"));
             return mapper.toDTO(cuenta);
         }
 
-        CuentaTecnica cuenta = cuentaRepo.findByCodigoBic(bic)
+        CuentaTecnica cuenta = cuentaRepo.findByBic(bic)
                 .orElseThrow(() -> new RuntimeException("Cuenta no encontrada para BIC: " + bic));
 
         String hashActual = calcularHash(cuenta);
@@ -160,7 +160,7 @@ public class ContabilidadServicio {
         String hashActual = calcularHash(cuenta);
         if (!hashActual.equals(cuenta.getFirmaIntegridad())) {
             throw new RuntimeException(
-                    "ALERTA DE SEGURIDAD: La cuenta " + cuenta.getCodigoBic() + " ha sido alterada.");
+                    "ALERTA DE SEGURIDAD: La cuenta " + cuenta.getBic() + " ha sido alterada.");
         }
 
         TipoMovimiento tipoOriginal = original.getTipo();
@@ -208,7 +208,7 @@ public class ContabilidadServicio {
 
     @Transactional
     public CuentaDTO reservarFondos(RegistroMovimientoRequest req) {
-        CuentaTecnica cuenta = cuentaRepo.findByCodigoBic(req.getCodigoBic())
+        CuentaTecnica cuenta = cuentaRepo.findByBic(req.getCodigoBic())
                 .orElseThrow(() -> new RuntimeException("Cuenta no encontrada para BIC: " + req.getCodigoBic()));
 
         String hashActual = calcularHash(cuenta);
@@ -231,7 +231,7 @@ public class ContabilidadServicio {
     @Transactional
     public void aplicarCompensacion(com.switchbank.mscontabilidad.dto.SolicitudCompensacionDTO req) {
         for (com.switchbank.mscontabilidad.dto.SolicitudCompensacionDTO.PosicionBancariaDTO pos : req.getPosiciones()) {
-            CuentaTecnica cuenta = cuentaRepo.findByCodigoBic(pos.getBic())
+            CuentaTecnica cuenta = cuentaRepo.findByBic(pos.getBic())
                     .orElseThrow(() -> new RuntimeException("Cuenta no encontrada para BIC: " + pos.getBic()));
 
             String hashActual = calcularHash(cuenta);
@@ -273,7 +273,7 @@ public class ContabilidadServicio {
                     .setScale(2, java.math.RoundingMode.HALF_UP)
                     .toString();
 
-            String data = saldoFormateado + bloqueadoFormateado + c.getCodigoBic() + secretKey;
+            String data = saldoFormateado + bloqueadoFormateado + c.getBic() + secretKey;
 
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             byte[] hash = digest.digest(data.getBytes(StandardCharsets.UTF_8));

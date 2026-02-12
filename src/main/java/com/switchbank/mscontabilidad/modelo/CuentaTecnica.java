@@ -15,11 +15,11 @@ public class CuentaTecnica {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "id")
-    private UUID id;
+    @Column(name = "idCuenta")
+    private UUID idCuenta;
 
-    @Column(name = "codigoBic", nullable = false, unique = true, length = 20)
-    private String codigoBic;
+    @Column(name = "bic", nullable = false, unique = true, length = 20)
+    private String bic;
 
     @Column(name = "saldoDisponible", nullable = false, precision = 18, scale = 2)
     private BigDecimal saldoDisponible;
@@ -37,8 +37,8 @@ public class CuentaTecnica {
     public CuentaTecnica() {
     }
 
-    public CuentaTecnica(String codigoBic) {
-        this.codigoBic = codigoBic;
+    public CuentaTecnica(String bic) {
+        this.bic = bic;
 
         this.saldoDisponible = BigDecimal.ZERO.setScale(2, java.math.RoundingMode.HALF_UP);
         this.fondosBloqueados = BigDecimal.ZERO.setScale(2, java.math.RoundingMode.HALF_UP);
