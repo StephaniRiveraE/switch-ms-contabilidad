@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.UUID;
 
 public interface MovimientoRepository extends JpaRepository<Movimiento, Long> {
-    List<Movimiento> findByCuentaId(UUID idCuenta);
+    List<Movimiento> findByCuentaIdCuenta(UUID idCuenta);
 
     List<Movimiento> findByIdInstruccion(UUID idInstruccion);
 
